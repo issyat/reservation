@@ -28,15 +28,19 @@ jobs:
       run: npm ci
 
     - name: Run tests
+      working-directory: ./frontend
       run: npm run test:ci
 
     - name: Build application
+      working-directory: ./frontend
       run: npm run build
 
     - name: Build Docker image
+      working-directory: ./frontend
       run: docker build -t reservation-frontend .
 
     - name: Check Docker build
+      working-directory: ./frontend
       run: |
         if [ $? -eq 0 ]; then
           echo "Docker build successful"
