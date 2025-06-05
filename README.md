@@ -97,7 +97,3 @@ cp backend/.env.example backend/.env
 3. Make your changes
 4. Add tests
 5. Submit a Pull Request
-
-## License
-
-[Add your license here]
