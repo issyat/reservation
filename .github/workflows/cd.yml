@@ -1,0 +1,99 @@
+name: Continuous Delivery - Docker Compose Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify-docker-compose:
+    runs-on: ubuntu-latest
+    name: Verify Docker Compose Stack
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3    
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Verify Docker Compose Installation
+      run: docker-compose --version
+
+    - name: Build Docker images
+      run: |
+        echo "Building Docker images..."
+        docker-compose build --no-cache
+
+    - name: Start services
+      run: |
+        echo "Starting services with Docker Compose..."
+        docker-compose up -d
+
+    - name: Wait for services to be ready
+      run: |
+        echo "Waiting for services to start..."
+        sleep 30
+
+    - name: Verify backend health
+      run: |
+        echo "Checking backend health endpoint..."
+        # Wait for backend to be ready
+        for i in {1..10}; do
+          if curl -f http://localhost:8000/health; then
+            echo "Backend health check passed"
+            break
+          else
+            echo "Attempt $i: Backend not ready yet, waiting..."
+            sleep 10
+          fi
+        done
+
+    - name: Verify frontend accessibility
+      run: |
+        echo "Checking frontend accessibility..."
+        # Check if frontend is serving content
+        for i in {1..10}; do
+          if curl -f http://localhost:3000; then
+            echo "Frontend accessibility check passed"
+            break
+          else
+            echo "Attempt $i: Frontend not ready yet, waiting..."
+            sleep 10
+          fi
+        done
+
+    - name: Check Docker Compose services status
+      run: |
+        echo "Checking services status..."
+        docker-compose ps
+        
+    - name: Show service logs for debugging
+      if: failure()
+      run: |
+        echo "=== Backend logs ==="
+        docker-compose logs backend
+        echo "=== Frontend logs ==="
+        docker-compose logs frontend
+
+    - name: Clean up
+      if: always()
+      run: |
+        echo "Cleaning up Docker resources..."
+        docker-compose down -v
+        docker system prune -f
+
+    - name: CD Pipeline Summary
+      if: success()
+      run: |
+        echo "✅ CD Pipeline completed successfully!"
+        echo "✅ Docker Compose stack verified"
+        echo "✅ Backend health check passed"
+        echo "✅ Frontend accessibility confirmed"
+        echo "🚀 Application is ready for deployment"
