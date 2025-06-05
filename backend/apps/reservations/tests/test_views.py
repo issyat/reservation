@@ -5,7 +5,7 @@ from ..models import Reservation
 from django.utils import timezone
 
 
-class ReservationViewTest(TestCase):
+class TestReservationView(TestCase):
     def setUp(self):
         # Use APIClient for DRF views
         self.client = APIClient()
