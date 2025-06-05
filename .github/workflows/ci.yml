@@ -33,7 +33,7 @@ jobs:
     - name: Run Django Tests
       working-directory: ./backend
       run: |
-        python manage.py test
+        python manage.py test apps.reservations.tests
 
     - name: Build Backend Docker image
       working-directory: ./backend

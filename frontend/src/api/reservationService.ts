@@ -2,7 +2,22 @@ import axios from 'axios';
 import type { Reservation, ReservationFormData } from '../interfaces/types';
 
 // Use environment variable or fallback to localhost
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+function getApiUrl() {
+  // For tests, use process.env
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+    return process.env.VITE_API_URL || 'http://localhost:8000/api';
+  }
+  
+  // For Vite builds, use globalThis to avoid Jest parsing issues
+  const viteEnv = (globalThis as any)?.import?.meta?.env;
+  if (viteEnv?.VITE_API_URL) {
+    return viteEnv.VITE_API_URL;
+  }
+  
+  return 'http://localhost:8000/api';
+}
+
+const API_URL = getApiUrl();
 
 // Create axios instance with default config
 const api = axios.create({
