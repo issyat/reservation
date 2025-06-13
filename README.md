@@ -14,9 +14,10 @@ A full-stack reservation management system built with Django REST API backend an
 ## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose
+- Docker and Docker Compose (for containerized development)
 - Node.js 18+ (for local development)
 - Python 3.11+ (for local development)
+- PostgreSQL 14+ (handled by Docker)
 
 ### Development Setup
 
@@ -26,31 +27,66 @@ git clone <repository-url>
 cd reservation
 ```
 
-2. Start the development environment:
+2. Setup environment files:
 ```bash
+# Frontend environment
+cp frontend/.env.example frontend/.env.development
+
+# Backend environment (if needed)
+cp backend/.env.example backend/.env
+```
+
+3. Start the development environment:
+```bash
+# Start all services
+docker-compose up
+
+# Or start in detached mode
 docker-compose up -d
 ```
 
 3. Access the applications:
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:5173
 - Backend API: http://localhost:8000
 - Database: localhost:5432
 
 ### Local Development
 
-#### Backend
+There are two ways to run the project:
+
+#### 1. Using Docker (Recommended)
 ```bash
-cd backend
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+# Start all services
+docker-compose up
+
+# Or start services separately
+docker-compose up db        # Start only database
+docker-compose up backend   # Start only backend
+docker-compose up frontend  # Start only frontend
 ```
 
-#### Frontend
+#### 2. Running Locally (Without Docker)
+
+First, start the PostgreSQL database using Docker:
+```bash
+docker-compose up db
+```
+
+Then start the backend:
+```bash
+cd backend
+python -m venv venv                  # Create virtual environment
+.\venv\Scripts\Activate.ps1         # Activate virtual environment (Windows)
+pip install -r requirements.txt      # Install dependencies
+python manage.py migrate            # Run migrations
+python manage.py runserver          # Start server
+```
+
+Finally, start the frontend:
 ```bash
 cd frontend
-npm install
-npm run dev
+npm install                # Install dependencies
+npm run dev               # Start development server
 ```
 
 ## Features
